@@ -1,6 +1,14 @@
+import AuthLayout from '@/layout/auth/AuthLayout';
+import SignIn from '@/view/auth/signIn/SignIn';
+
 export const publicRoutes = [
   {
-    path: '/auth/*',
-    element: <div>public</div>,
+    element: <AuthLayout />,
+    children: [
+      {
+        path: '/auth/sign-in',
+        element: <SignIn />,
+      },
+    ],
   },
 ];

@@ -1,12 +1,35 @@
-import { useRoutes } from 'react-router-dom';
+// import Cookies from 'js-cookie';
+import { useRoutes, Navigate } from 'react-router-dom';
+
+import useAuthStatus from '@/hook/useAuthStatus';
+import MainLayout from '@/layout/admin/MainLayout';
 
 import { protectedRoutes } from './protected';
 import { publicRoutes } from './public';
 
-export const AppRoutes = () => {
-  const auth = true;
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isLoggedIn, loading } = useAuthStatus();
 
-  const routes = auth ? protectedRoutes : publicRoutes;
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner/loading component
+  }
+
+  return isLoggedIn ? children : <Navigate to="/auth/sign-in" replace />;
+};
+
+export const AppRoutes = () => {
+  const routes = [
+    ...publicRoutes,
+    {
+      path: '/',
+      element: (
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      ),
+      children: protectedRoutes,
+    },
+  ];
 
   const element = useRoutes([...routes]);
 

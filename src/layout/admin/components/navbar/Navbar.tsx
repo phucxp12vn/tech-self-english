@@ -12,7 +12,6 @@ import NavbarLinks from '../navbarLinks/NavbarLinks';
 
 const Navbar = (props: { secondary: boolean; brandText: string; fixed: boolean }) => {
   const { secondary, brandText } = props;
-
   const mainText = useColorModeValue('navy.700', 'white');
   const secondaryText = useColorModeValue('gray.700', 'white');
   const navbarPosition = 'fixed' as const;

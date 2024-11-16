@@ -1,9 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 // Default config for the axios instance
 const axiosParams = {
+  withCredentials: true,
   // Set different base URL based on the environment
-  // baseURL: 'http://104.248.148.17:3000',
-  baseURL: 'https://tech-self-english-server.vercel.app',
+  baseURL: 'http://localhost:3000',
+  // baseURL: 'https://tech-self-english-server.vercel.app',
 };
 
 // Create axios instance with default params
@@ -23,4 +24,5 @@ const api = (axios: AxiosInstance) => {
   };
 };
 
+// Export both API instances
 export default api(axiosInstance);
