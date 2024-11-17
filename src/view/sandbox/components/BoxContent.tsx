@@ -1,18 +1,28 @@
 import { useContext } from 'react';
 
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { ChevronLeftIcon, ChevronRightIcon, RepeatIcon } from '@chakra-ui/icons';
 import { Box, Button, IconButton, Text, useColorModeValue } from '@chakra-ui/react';
 
 import { LearnBoxContext, LearnBoxType } from '@/contexts/LearnBoxContext';
 import { useGetTranscript } from '@/hook/useTranscript';
+import { LearnMode } from '@/types/learn';
 
 const availablePlaybackRates = [1, 0.75, 0.5];
 
-const BoxContent = ({ sentenceIndex, playRateIndex, onNext, onPrev, onChangeRate }: any) => {
+const BoxContent = ({
+  sentenceIndex,
+  playRateIndex,
+  learnMode,
+  onNext,
+  onPrev,
+  onChangeRate,
+  onChangeLeanMode,
+}: any) => {
   const { videoId } = useContext(LearnBoxContext) as LearnBoxType;
   const { data: transcript } = useGetTranscript(videoId);
   const sentences = transcript?.sentences ?? [];
   const textColorPrimary = useColorModeValue('secondaryGray.900', 'white');
+  const iconColor = useColorModeValue('brand.700', 'white');
 
   return (
     <Box
@@ -27,6 +37,14 @@ const BoxContent = ({ sentenceIndex, playRateIndex, onNext, onPrev, onChangeRate
       <Button variant="outline" size="md" onClick={onChangeRate}>
         {availablePlaybackRates[playRateIndex]}x
       </Button>
+      <IconButton
+        onClick={onChangeLeanMode}
+        aria-label="repeat"
+        variant={learnMode === LearnMode.SINGLE ? 'outline' : 'ghost'}
+        colorScheme={iconColor}
+        ml={4}
+        icon={<RepeatIcon />}
+      />
       {sentences?.[sentenceIndex] ? (
         <Box h={'calc(100% - 80px)'}>
           <Text color={textColorPrimary} fontWeight="bold" fontSize="xl" mb="4px">
