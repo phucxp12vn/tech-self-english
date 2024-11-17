@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import { Card } from '@chakra-ui/react';
 import YouTube, { YouTubeProps, YouTubePlayer } from 'react-youtube';
 
 import { LearnBoxContext, LearnBoxType } from '@/contexts/LearnBoxContext';
@@ -9,7 +8,6 @@ import { LearnModeType, LearnMode } from '@/types/learn';
 
 import BoxAction from './components/boxAction/BoxAction';
 import BoxContent from './components/BoxContent';
-import NoChoseVideo from './components/NoChoseVideo';
 import YoutubeVideo from './components/YoutubeVideo';
 
 const availablePlaybackRates = [1, 0.75, 0.5];
@@ -146,29 +144,23 @@ const LearnBox = () => {
   };
 
   return (
-    <Card p={4} minH="100vh">
-      {videoId !== '' ? (
-        <>
-          <YoutubeVideo
-            videoId={videoId}
-            onReady={handlePlayerReady}
-            onStateChange={handlePlayerChange}
-          />
-          <BoxAction />
-          <BoxContent
-            sentenceIndex={sentenceIndex}
-            playRateIndex={playRateIndex}
-            learnMode={learnMode}
-            onNext={handleNext}
-            onPrev={handlePrevious}
-            onChangeRate={handleChangePlayRate}
-            onChangeLeanMode={handleChangeLearnMode}
-          />
-        </>
-      ) : (
-        <NoChoseVideo />
-      )}
-    </Card>
+    <>
+      <YoutubeVideo
+        videoId={videoId}
+        onReady={handlePlayerReady}
+        onStateChange={handlePlayerChange}
+      />
+      <BoxAction />
+      <BoxContent
+        sentenceIndex={sentenceIndex}
+        playRateIndex={playRateIndex}
+        learnMode={learnMode}
+        onNext={handleNext}
+        onPrev={handlePrevious}
+        onChangeRate={handleChangePlayRate}
+        onChangeLeanMode={handleChangeLearnMode}
+      />
+    </>
   );
 };
 
