@@ -2,9 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 // Default config for the axios instance
 const axiosParams = {
   withCredentials: true,
-  // Set different base URL based on the environment
-  baseURL: 'http://localhost:3000',
-  // baseURL: 'https://tech-self-english-server.vercel.app',
+  baseURL: import.meta.env.VITE_BACKEND_URL,
 };
 
 // Create axios instance with default params
