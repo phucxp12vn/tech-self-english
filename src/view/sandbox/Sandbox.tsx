@@ -7,14 +7,20 @@ import LearnBoxProvider, { LearnBoxContext, LearnBoxType } from '@/contexts/Lear
 import NoChoseVideo from './components/NoChoseVideo';
 import LearnBox from './LearnBox';
 
-const Sandbox = () => {
+const SandBoxCard = () => {
   const { videoId } = useContext(LearnBoxContext) as LearnBoxType;
 
   return (
+    <Card p={4} minH="100vh">
+      {videoId !== '' ? <LearnBox /> : <NoChoseVideo />}
+    </Card>
+  );
+};
+
+const Sandbox = () => {
+  return (
     <LearnBoxProvider>
-      <Card p={4} minH="100vh">
-        {videoId !== '' ? <LearnBox /> : <NoChoseVideo />}
-      </Card>
+      <SandBoxCard />
     </LearnBoxProvider>
   );
 };
