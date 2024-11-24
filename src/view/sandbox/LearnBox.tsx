@@ -16,12 +16,16 @@ const LearnBox = () => {
   const { videoId } = useContext(LearnBoxContext) as LearnBoxType;
   const { data: transcript } = useGetTranscript(videoId);
   const sentences = transcript?.sentences ?? [];
+  // const storyRange = transcript?.storyRange ?? [];
+  const startPoint = transcript?.startPoint ?? 0;
+  const endPoint = transcript?.endPoint ?? 0;
   const [learnMode, setLearnMode] = useState<LearnModeType>(LearnMode.STORY);
-
   const playerVideo = useRef<YouTubePlayer | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [sentenceIndex, setSentenceIndex] = useState(0);
+  const [sentenceIndex, setSentenceIndex] = useState(startPoint);
   const [playRateIndex, setPlayRateIndex] = useState(0);
+  const [startStorySentence, setStartStorySentence] = useState(startPoint);
+  const [endStorySentence, setEndStorySentence] = useState(endPoint);
 
   useEffect(() => {
     return () => {
@@ -31,6 +35,15 @@ const LearnBox = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setStartStorySentence(startPoint);
+    setSentenceIndex(startPoint);
+  }, [startPoint]);
+
+  useEffect(() => {
+    setEndStorySentence(endPoint);
+  }, [endPoint]);
 
   useEffect(() => {
     playerVideo.current = null;
@@ -44,6 +57,7 @@ const LearnBox = () => {
   const handlePlayerReady: YouTubeProps['onReady'] = (event) => {
     playerVideo.current = event.target;
     playerVideo.current.playVideo();
+    playVideoSeekTo(sentenceIndex);
   };
 
   const handlePlayerChange: YouTubeProps['onStateChange'] = (event) => {
@@ -81,11 +95,7 @@ const LearnBox = () => {
       clearInterval(intervalRef.current);
     }
 
-    const focusSentence = sentences[newSentenceIndex];
-
-    if (focusSentence) {
-      playerVideo.current?.seekTo(focusSentence.startTime / 1000);
-    }
+    playVideoSeekTo(newSentenceIndex);
   };
 
   const handlePlay = () => {
@@ -106,13 +116,16 @@ const LearnBox = () => {
             handlePlaySpecificSentence(sentenceIndex);
           break;
         case LearnMode.STORY:
-          currentSentenceIndex >= 10 && playerVideo.current?.seekTo(0);
+          currentSentenceIndex >= endStorySentence &&
+            handlePlaySpecificSentence(startStorySentence);
           setSentenceIndex((prevIndex) => {
             if (currentSentenceIndex === -1 || currentSentenceIndex === prevIndex) {
               return prevIndex;
             }
 
-            return currentSentenceIndex >= 10 ? 0 : currentSentenceIndex;
+            return currentSentenceIndex >= endStorySentence
+              ? startStorySentence
+              : currentSentenceIndex;
           });
           break;
       }
@@ -142,6 +155,18 @@ const LearnBox = () => {
       return newSentenceIndex;
     });
   };
+
+  const playVideoSeekTo = (sentenceIndex: number) => {
+    const focusSentence = sentences[sentenceIndex];
+
+    if (focusSentence) {
+      playerVideo.current?.seekTo(focusSentence.startTime / 1000);
+    }
+  };
+
+  if (!transcript) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>

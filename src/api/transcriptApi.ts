@@ -8,6 +8,9 @@ export interface TranscriptYoutube {
 export interface VideoTitle {
   videoId: string;
   title: string;
+  storyRange: number;
+  startPoint: number;
+  endPoint: number;
 }
 
 export interface Sentence {
@@ -63,7 +66,7 @@ export const deleteTranscriptSentence = async (id: string) => {
 export const getTranscriptTitle = async () => {
   const { data } = await api.get<VideoTitle[]>(`/transcripts`, {});
 
-  return data.map(({ videoId, title }) => ({ videoId, title }));
+  return data;
 };
 
 export const generateTranscript = async (videoId: string) => {
