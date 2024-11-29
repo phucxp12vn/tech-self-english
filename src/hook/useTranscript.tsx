@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Transcript,
   TranscriptYoutube,
-  VideoTitle,
+  Video,
   getTranscriptYoutube,
   getTranscript,
   addTranscript,
@@ -12,6 +12,8 @@ import {
   deleteTranscriptSentence,
   getTranscriptTitle,
   generateTranscript,
+  updateTranscriptSettings,
+  VideoSetting,
 } from '@/api/transcriptApi';
 
 const key = 'transcript';
@@ -93,7 +95,7 @@ export const useDeleteTranscriptSentence = (videoId: string) => {
 };
 
 export const useGetTranscriptTitle = () => {
-  return useQuery<VideoTitle[]>({
+  return useQuery<Video[]>({
     queryKey: [`video_title`],
     queryFn: getTranscriptTitle,
   });
@@ -102,5 +104,25 @@ export const useGetTranscriptTitle = () => {
 export const useGenerateTranscript = () => {
   return useMutation({
     mutationFn: generateTranscript,
+  });
+};
+
+export const useUpdateTranscriptSettings = (videoId: string) => {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  return useMutation({
+    mutationFn: (settings: VideoSetting) => updateTranscriptSettings(videoId, settings),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`${key}_${videoId}_settings`] });
+
+      toast({
+        title: 'Video settings updated.',
+        description: "We've updated the transcript settings.",
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+    },
   });
 };

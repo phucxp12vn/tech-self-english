@@ -3,11 +3,12 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import YouTube, { YouTubeProps, YouTubePlayer } from 'react-youtube';
 
 import { LearnBoxContext, LearnBoxType } from '@/contexts/LearnBoxContext';
-import { useGetTranscript } from '@/hook/useTranscript';
+import { useGetTranscript, useUpdateTranscriptSettings } from '@/hook/useTranscript';
 import { LearnModeType, LearnMode } from '@/types/learn';
 
 import BoxAction from './components/boxAction/BoxAction';
 import BoxContent from './components/BoxContent';
+import SelectLearnPart from './components/SelectLearnPart';
 import YoutubeVideo from './components/YoutubeVideo';
 
 const availablePlaybackRates = [1, 0.75, 0.5];
@@ -16,7 +17,7 @@ const LearnBox = () => {
   const { videoId } = useContext(LearnBoxContext) as LearnBoxType;
   const { data: transcript } = useGetTranscript(videoId);
   const sentences = transcript?.sentences ?? [];
-  // const storyRange = transcript?.storyRange ?? [];
+  const storyRange = transcript?.storyRange ?? 0;
   const startPoint = transcript?.startPoint ?? 0;
   const endPoint = transcript?.endPoint ?? 0;
   const [learnMode, setLearnMode] = useState<LearnModeType>(LearnMode.STORY);
@@ -26,6 +27,7 @@ const LearnBox = () => {
   const [playRateIndex, setPlayRateIndex] = useState(0);
   const [startStorySentence, setStartStorySentence] = useState(startPoint);
   const [endStorySentence, setEndStorySentence] = useState(endPoint);
+  const { mutate: updateTranscriptSettings } = useUpdateTranscriptSettings(videoId);
 
   useEffect(() => {
     return () => {
@@ -109,17 +111,24 @@ const LearnBox = () => {
         (sentence) => currentTime >= sentence.startTime && currentTime <= sentence.endTime
       );
 
+      if (currentSentenceIndex === -1) {
+        return;
+      }
+
       switch (learnMode) {
         case LearnMode.SINGLE:
-          currentSentenceIndex !== -1 &&
-            currentSentenceIndex !== sentenceIndex &&
-            handlePlaySpecificSentence(sentenceIndex);
+          currentSentenceIndex !== sentenceIndex && handlePlaySpecificSentence(sentenceIndex);
           break;
         case LearnMode.STORY:
-          currentSentenceIndex >= endStorySentence &&
+          if (
+            currentSentenceIndex < startStorySentence ||
+            currentSentenceIndex >= endStorySentence
+          ) {
             handlePlaySpecificSentence(startStorySentence);
+          }
+
           setSentenceIndex((prevIndex) => {
-            if (currentSentenceIndex === -1 || currentSentenceIndex === prevIndex) {
+            if (currentSentenceIndex === prevIndex) {
               return prevIndex;
             }
 
@@ -156,6 +165,13 @@ const LearnBox = () => {
     });
   };
 
+  const handleChangeStorySentence = (startSentence: number, endSentence: number) => {
+    setStartStorySentence(startSentence);
+    setEndStorySentence(endSentence);
+    handlePlaySpecificSentence(startSentence);
+    updateTranscriptSettings({ storyRange, startPoint: startSentence, endPoint: endSentence });
+  };
+
   const playVideoSeekTo = (sentenceIndex: number) => {
     const focusSentence = sentences[sentenceIndex];
 
@@ -176,6 +192,12 @@ const LearnBox = () => {
         onStateChange={handlePlayerChange}
       />
       <BoxAction />
+      <SelectLearnPart
+        partRange={storyRange}
+        totalSentence={sentences.length}
+        currentPart={Math.floor(startStorySentence / storyRange)}
+        onChangeVideoPart={handleChangeStorySentence}
+      />
       <BoxContent
         sentenceIndex={sentenceIndex}
         playRateIndex={playRateIndex}

@@ -5,9 +5,12 @@ export interface TranscriptYoutube {
   time: number;
 }
 
-export interface VideoTitle {
+export interface Video {
   videoId: string;
   title: string;
+}
+
+export interface VideoSetting {
   storyRange: number;
   startPoint: number;
   endPoint: number;
@@ -21,7 +24,7 @@ export interface Sentence {
   notes: string;
 }
 
-export type Transcript = VideoTitle & { sentences: Sentence[] };
+export type Transcript = Video & VideoSetting & { sentences: Sentence[] };
 
 type TranscriptRequest = Omit<Sentence, 'id'> & { videoId: string };
 
@@ -64,13 +67,19 @@ export const deleteTranscriptSentence = async (id: string) => {
 };
 
 export const getTranscriptTitle = async () => {
-  const { data } = await api.get<VideoTitle[]>(`/transcripts`, {});
+  const { data } = await api.get<Video[]>(`/transcripts`, {});
 
   return data;
 };
 
 export const generateTranscript = async (videoId: string) => {
   const { data } = await api.post<Transcript>(`/transcripts/${videoId}`, {});
+
+  return data;
+};
+
+export const updateTranscriptSettings = async (videoId: string, settings: VideoSetting) => {
+  const { data } = await api.put<Sentence[]>(`/transcripts/settings/${videoId}`, settings);
 
   return data;
 };
