@@ -3,6 +3,7 @@ import { useRoutes, Navigate } from 'react-router-dom';
 
 import useAuthStatus from '@/hook/useAuthStatus';
 import MainLayout from '@/layout/admin/MainLayout';
+import AuthLayout from '@/layout/auth/AuthLayout';
 
 import { protectedRoutes } from './protected';
 import { publicRoutes } from './public';
@@ -19,7 +20,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 export const AppRoutes = () => {
   const routes = [
-    ...publicRoutes,
+    {
+      path: '/auth',
+      element: <AuthLayout />,
+      children: publicRoutes,
+    },
     {
       path: '/',
       element: (
