@@ -5,7 +5,7 @@
       "destination": "https://tech-self-english-server.vercel.app/:path*"
     },
     {
-      "source": "^(?!/api).*",
+      "source": "/:path*",
       "destination": "/"
     }
   ]
