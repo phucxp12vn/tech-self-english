@@ -1,8 +1,8 @@
 import { Button, Center, Stack, useDisclosure } from '@chakra-ui/react';
 
+import SelectLearnVideo from '../SelectLearnVideo';
 import TranscriptFormModal from './components/TranscriptFormModal';
 import TranscriptSummaryModal from './components/TranscriptSummaryModal';
-import SelectLearnVideo from '../SelectLearnVideo';
 
 const BoxAction = () => {
   const { isOpen: isOpenSummary, onOpen: onOpenSummary, onClose: onCloseSummary } = useDisclosure();

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./src/*"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,
@@ -9,23 +9,20 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    /* Bundler mode */
+
     "moduleResolution": "bundler",
+    "types": [],
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    /* Linting */
+
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", ".eslintrc.cjs", "src"],
-  "references": [
-    {
-      "path": "./tsconfig.node.json",
-    },
-  ],
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

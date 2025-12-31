@@ -19,7 +19,9 @@ const SelectLearnVideo = () => {
       value={(videoTitles ?? []).find((video) => video.videoId === videoId)?.title ?? ''}
       onChange={handleSelectVideo}
     >
-      {videoTitles?.map(({ videoId, title }) => <option key={videoId}>{title}</option>)}
+      {videoTitles?.map(({ videoId, title }) => (
+        <option key={videoId}>{title}</option>
+      ))}
     </Select>
   );
 };

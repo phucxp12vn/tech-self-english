@@ -6,7 +6,7 @@ module.exports = {
   },
   parserOptions: { ecmaVersion: 8, sourceType: 'module' },
   parserOptions: {
-    project: './tsconfig.json',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
     tsconfigRootDir: './',
   },
   ignorePatterns: ['node_modules/*', 'dist', '.eslintrc.cjs'],

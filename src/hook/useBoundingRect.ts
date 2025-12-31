@@ -1,56 +1,44 @@
-import { useState, useCallback, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-type DebounceFunction = (...args: any[]) => void;
+type Rect = DOMRectReadOnly;
 
-const debounce = (limit: number, callback: DebounceFunction) => {
-  let timeoutId: NodeJS.Timeout;
-  return (...args: any[]) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(callback, limit, args);
-  };
-};
+function debounce<T extends (...args: any[]) => void>(delay: number, fn: T) {
+  let timer: ReturnType<typeof setTimeout>;
 
-function getDimensionObject(node: any) {
-  const rect = node.getBoundingClientRect();
-  return {
-    width: rect.width,
-    height: rect.height,
-    top: rect.top,
-    left: rect.left,
-    x: rect.x,
-    y: rect.y,
-    right: rect.right,
-    bottom: rect.bottom,
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
   };
 }
 
-export default function useBoundingRect(limit = 100) {
-  const [dimensions, setDimensions] = useState<any>({});
-  const [node, setNode] = useState(null);
+export default function useBoundingRect(delay = 100) {
+  const nodeRef = useRef<HTMLElement | null>(null);
+  const [rect, setRect] = useState<Rect | null>(null);
 
-  const ref = useCallback((node: any) => {
-    setNode(node);
+  const ref = useCallback((node: HTMLElement | null) => {
+    nodeRef.current = node;
   }, []);
 
   useLayoutEffect(() => {
-    if ('undefined' !== typeof window && node) {
-      const measure = () =>
-        window.requestAnimationFrame(() => setDimensions(getDimensionObject(node)));
+    if (!nodeRef.current) return;
 
-      measure();
+    const measure = () => {
+      const node = nodeRef.current;
+      if (!node) return;
+      setRect(node.getBoundingClientRect());
+    };
 
-      const listener = debounce(limit ? limit : 100, measure);
+    const listener = debounce(delay, measure);
 
-      window.addEventListener('resize', listener);
-      window.addEventListener('scroll', listener);
-      return () => {
-        window.removeEventListener('resize', listener);
-        window.removeEventListener('scroll', listener);
-      };
-    }
-  }, [node, limit]);
+    measure();
+    window.addEventListener('resize', listener);
+    window.addEventListener('scroll', listener, true);
 
-  return [ref, dimensions, node];
+    return () => {
+      window.removeEventListener('resize', listener);
+      window.removeEventListener('scroll', listener, true);
+    };
+  }, [delay]);
+
+  return [ref, rect] as const;
 }
